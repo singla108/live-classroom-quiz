@@ -1,0 +1,115 @@
+{
+  "quizTitle": "AI in Banking & Financial Services – Batch A",
+  "timePerQuestion": 20,
+  "questions": [
+    {
+      "id": 1,
+      "question": "In the concept-stack slide, which layer is described as 'predicts & classifies'?",
+      "options": ["Generative AI", "AI / Machine Learning", "Agentic AI", "Robotic Process Automation"],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 2,
+      "question": "Which layer is described as 'plans & acts'?",
+      "options": ["AI / Machine Learning", "Generative AI", "Agentic AI", "Business Intelligence"],
+      "correctAnswer": 2,
+      "timeLimit": 20
+    },
+    {
+      "id": 3,
+      "question": "On the maturity curve slide, which period is labeled 'Predictive AI'?",
+      "options": ["Pre-2015", "2015–2022", "2023–2025", "2026 →"],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 4,
+      "question": "According to the deck, what percentage of finance teams will use agentic AI in 2026?",
+      "options": ["12%", "44%", "60%", "90%"],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 5,
+      "question": "Which bank has all 60,000+ employees on Microsoft Copilot Chat plus an internal LLM?",
+      "options": ["Barclays", "HSBC", "NatWest", "Lloyds"],
+      "correctAnswer": 2,
+      "timeLimit": 20
+    },
+    {
+      "id": 6,
+      "question": "What is 'BarxBot'?",
+      "options": [
+        "A NatWest fraud-detection agent",
+        "A live Barclays Markets tool that helps traders initiate FX trades faster",
+        "An HSBC customer chatbot",
+        "An FCA sandbox tool"
+      ],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 7,
+      "question": "Which UK bank has called 2026 'the year of Agentic AI'?",
+      "options": ["NatWest", "Barclays", "Lloyds Banking Group", "HSBC"],
+      "correctAnswer": 2,
+      "timeLimit": 20
+    },
+    {
+      "id": 8,
+      "question": "In insurance, what does the deck say should stay scoped to low-risk steps, with humans retained on consequential decisions?",
+      "options": ["All customer communications", "Agentic AI", "Generative AI", "Cloud migration"],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 9,
+      "question": "What does the FCA stand for, as spelled out in the deck?",
+      "options": [
+        "Federal Compliance Authority",
+        "Financial Conduct Authority",
+        "Fintech Certification Agency",
+        "Financial Consumer Alliance"
+      ],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 10,
+      "question": "What is the FCA's stated approach to intervening in firms' AI use?",
+      "options": [
+        "Pre-approval required for every AI model before launch",
+        "Zero tolerance for any AI error",
+        "Principles-based, outcomes-focused, intervening mainly on 'egregious failures that are not dealt with'",
+        "No involvement until a formal complaint is filed"
+      ],
+      "correctAnswer": 2,
+      "timeLimit": 25
+    },
+    {
+      "id": 11,
+      "question": "Who did NatWest Group's India GCC partner with in April 2026, per the deck's source citation?",
+      "options": [
+        "IIM Ahmedabad's Innovation Cell",
+        "FITT, IIT Delhi",
+        "The Bank of England Innovation Hub",
+        "Nasscom"
+      ],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 12,
+      "question": "According to the 'Bigger Picture' slide, what is changing about India's GCCs?",
+      "options": [
+        "They are shutting down in favour of fully remote teams",
+        "They are moving from executing well-defined, lower-risk tasks to co-owning AI/data problems",
+        "They are being replaced by European tech hubs",
+        "They now only handle payroll and HR functions"
+      ],
+      "correctAnswer": 1,
+      "timeLimit": 25
+    }
+  ]
+}

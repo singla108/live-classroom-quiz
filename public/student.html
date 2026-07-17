@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Join Quiz</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="student-body">
+  <div id="app" class="student-app">
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="screen active">
+      <div class="login-container">
+        <div class="login-header">
+          <h1>🎯 Quiz Time!</h1>
+          <p>Enter your name to join</p>
+        </div>
+        <form id="join-form" class="login-form">
+          <input
+            type="text"
+            id="player-name"
+            placeholder="Your name"
+            maxlength="20"
+            autocomplete="off"
+            required
+            aria-label="Your display name"
+          />
+          <button type="submit" class="btn btn-primary btn-large">Join Quiz</button>
+        </form>
+        <p id="login-error" class="error-text"></p>
+      </div>
+    </div>
+
+    <!-- WAITING SCREEN -->
+    <div id="waiting-screen" class="screen">
+      <div class="waiting-container">
+        <div class="waiting-icon">✓</div>
+        <h2>You're in, <span id="display-name"></span>!</h2>
+        <p class="waiting-text">Waiting for the host to start the quiz...</p>
+        <div class="pulse-dot"></div>
+      </div>
+    </div>
+
+    <!-- QUESTION SCREEN -->
+    <div id="student-question-screen" class="screen">
+      <div class="student-question-header">
+        <div class="student-progress">
+          <span id="sq-current">1</span> / <span id="sq-total">10</span>
+        </div>
+        <div class="student-timer" id="student-timer">
+          <span id="student-timer-value">20</span>s
+        </div>
+      </div>
+      <div class="student-question-text">
+        <h2 id="student-question"></h2>
+      </div>
+      <div id="student-options" class="student-options"></div>
+    </div>
+
+    <!-- ANSWER FEEDBACK SCREEN -->
+    <div id="feedback-screen" class="screen">
+      <div class="feedback-container">
+        <div id="feedback-icon" class="feedback-icon"></div>
+        <h2 id="feedback-text"></h2>
+        <p id="feedback-score"></p>
+        <div id="feedback-correct-answer" class="feedback-correct-answer"></div>
+        <p class="waiting-text" id="feedback-waiting">Waiting for next question...</p>
+      </div>
+    </div>
+
+    <!-- FINAL SCORE SCREEN -->
+    <div id="student-final-screen" class="screen">
+      <div class="final-score-container">
+        <h1>🏆 Quiz Complete!</h1>
+        <div id="student-rank" class="student-rank"></div>
+        <div id="student-final-score" class="student-final-score"></div>
+        <div id="student-stats" class="student-stats"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let ws;
+    let playerId = null;
+    let playerName = '';
+    let timerInterval = null;
+    let selectedAnswer = null;
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    // Join form
+    document.getElementById('join-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      playerName = document.getElementById('player-name').value.trim();
+      if (!playerName) return;
+
+      connectWebSocket();
+    });
+
+    function connectWebSocket() {
+      ws = new WebSocket(`ws://${window.location.host}`);
+
+      ws.onopen = () => {
+        ws.send(JSON.stringify({
+          type: 'player-join',
+          name: playerName,
+          playerId: playerId,
+        }));
+      };
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        switch (data.type) {
+          case 'join-confirmed':
+            playerId = data.playerId;
+            document.getElementById('display-name').textContent = playerName;
+            if (data.gameStatus === 'waiting') {
+              showScreen('waiting-screen');
+            }
+            break;
+
+          case 'quiz-started':
+            showScreen('waiting-screen');
+            break;
+
+          case 'question':
+            showQuestion(data);
+            break;
+
+          case 'answer-confirmed':
+            showFeedback(data);
+            break;
+
+          case 'question-results':
+            showCorrectAnswer(data);
+            break;
+
+          case 'quiz-finished':
+            showFinalScore(data.rankings);
+            break;
+
+          case 'quiz-reset':
+            showScreen('waiting-screen');
+            break;
+        }
+      };
+
+      ws.onclose = () => {
+        // Attempt reconnect after 2 seconds
+        setTimeout(() => {
+          if (playerId) connectWebSocket();
+        }, 2000);
+      };
+    }
+
+    function showQuestion(data) {
+      showScreen('student-question-screen');
+      selectedAnswer = null;
+
+      document.getElementById('sq-current').textContent = data.questionIndex + 1;
+      document.getElementById('sq-total').textContent = data.totalQuestions;
+      document.getElementById('student-question').textContent = data.question;
+
+      const colors = ['opt-red', 'opt-blue', 'opt-yellow', 'opt-green'];
+      const shapes = ['▲', '◆', '●', '■'];
+      const optionsEl = document.getElementById('student-options');
+      optionsEl.innerHTML = data.options.map((opt, i) =>
+        `<button class="student-option-btn ${colors[i]}" data-index="${i}" aria-label="Option ${i + 1}: ${opt}">
+          <span class="option-shape">${shapes[i]}</span>
+          <span>${escapeHtml(opt)}</span>
+        </button>`
+      ).join('');
+
+      // Add click handlers
+      optionsEl.querySelectorAll('.student-option-btn').forEach(btn => {
+        btn.addEventListener('click', () => submitAnswer(parseInt(btn.dataset.index)));
+      });
+
+      // Start timer
+      startTimer(data.timeLimit);
+    }
+
+    function startTimer(seconds) {
+      clearInterval(timerInterval);
+      let remaining = seconds;
+      const timerEl = document.getElementById('student-timer-value');
+      timerEl.textContent = Math.ceil(remaining);
+
+      timerInterval = setInterval(() => {
+        remaining -= 0.1;
+        if (remaining <= 0) {
+          remaining = 0;
+          clearInterval(timerInterval);
+          // Auto-submit no answer if time runs out
+          if (selectedAnswer === null) {
+            showFeedback({ correct: false, score: 0, totalScore: 0 });
+          }
+        }
+        timerEl.textContent = Math.ceil(remaining);
+        // Visual urgency
+        if (remaining <= 5) {
+          document.getElementById('student-timer').classList.add('urgent');
+        } else {
+          document.getElementById('student-timer').classList.remove('urgent');
+        }
+      }, 100);
+    }
+
+    function submitAnswer(index) {
+      if (selectedAnswer !== null) return;
+      selectedAnswer = index;
+
+      // Highlight selected
+      const buttons = document.querySelectorAll('.student-option-btn');
+      buttons.forEach(btn => {
+        btn.disabled = true;
+        if (parseInt(btn.dataset.index) === index) {
+          btn.classList.add('selected');
+        }
+      });
+
+      clearInterval(timerInterval);
+      ws.send(JSON.stringify({ type: 'submit-answer', answer: index }));
+    }
+
+    function showFeedback(data) {
+      showScreen('feedback-screen');
+      clearInterval(timerInterval);
+
+      const icon = document.getElementById('feedback-icon');
+      const text = document.getElementById('feedback-text');
+      const score = document.getElementById('feedback-score');
+
+      if (data.correct) {
+        icon.textContent = '✓';
+        icon.className = 'feedback-icon correct';
+        text.textContent = 'Correct!';
+        score.textContent = `+${data.score} points`;
+      } else {
+        icon.textContent = '✗';
+        icon.className = 'feedback-icon wrong';
+        text.textContent = 'Not quite!';
+        score.textContent = `Total: ${data.totalScore} points`;
+      }
+    }
+
+    function showCorrectAnswer(data) {
+      showScreen('feedback-screen');
+      clearInterval(timerInterval);
+
+      // Show the correct answer
+      const correctEl = document.getElementById('feedback-correct-answer');
+      const colors = ['opt-red', 'opt-blue', 'opt-yellow', 'opt-green'];
+      const correctOption = data.options[data.correctAnswer];
+      correctEl.innerHTML = `
+        <div class="correct-answer-reveal">
+          <p class="correct-answer-label">Correct Answer:</p>
+          <div class="correct-answer-option ${colors[data.correctAnswer]}">
+            ${escapeHtml(correctOption)}
+          </div>
+        </div>
+      `;
+
+      // Hide the waiting text since answer is revealed
+      document.getElementById('feedback-waiting').textContent = 'Get ready for the next question...';
+    }
+
+    function showFinalScore(rankings) {
+      showScreen('student-final-screen');
+      clearInterval(timerInterval);
+
+      const myRank = rankings.findIndex(r => r.id === playerId) + 1;
+      const myData = rankings.find(r => r.id === playerId);
+
+      document.getElementById('student-rank').innerHTML = myRank <= 3
+        ? `<span class="big-rank">${['🥇', '🥈', '🥉'][myRank - 1]}</span><p>#${myRank} Place</p>`
+        : `<span class="big-rank">#${myRank}</span><p>out of ${rankings.length} players</p>`;
+
+      document.getElementById('student-final-score').innerHTML = myData
+        ? `<div class="score-big">${myData.score}</div><p>points</p>`
+        : '';
+
+      document.getElementById('student-stats').innerHTML = myData
+        ? `<p>${myData.correctAnswers} correct answers</p>`
+        : '';
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

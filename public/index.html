@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Host Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <!-- QUIZ SELECTION SCREEN -->
+    <div id="select-screen" class="screen active">
+      <div class="header">
+        <h1>🎯 Quiz Host</h1>
+        <p class="subtitle">Select a quiz to begin</p>
+      </div>
+      <div id="quiz-options" class="quiz-select-grid"></div>
+    </div>
+
+    <!-- LOBBY SCREEN -->
+    <div id="lobby-screen" class="screen">
+      <div class="header">
+        <h1 id="quiz-title">Quiz</h1>
+        <p class="subtitle">Scan the QR code to join!</p>
+      </div>
+      <div class="lobby-content">
+        <div class="qr-section">
+          <div id="qr-container">
+            <img id="qr-code" alt="QR Code" />
+          </div>
+          <p id="join-url" class="join-url"></p>
+        </div>
+        <div class="players-section">
+          <h2>Players Joined: <span id="player-count">0</span></h2>
+          <div id="player-list" class="player-list"></div>
+        </div>
+      </div>
+      <button id="start-btn" class="btn btn-primary btn-large" disabled>Start Quiz</button>
+    </div>
+
+    <!-- QUESTION SCREEN (Host view) -->
+    <div id="question-screen" class="screen">
+      <div class="question-header">
+        <div class="question-progress">
+          Question <span id="q-current">1</span> of <span id="q-total">10</span>
+        </div>
+        <div class="timer" id="timer">
+          <div class="timer-circle">
+            <span id="timer-value">20</span>
+          </div>
+        </div>
+      </div>
+      <div class="question-body">
+        <h2 id="question-text" class="question-text"></h2>
+        <div id="options-display" class="options-grid"></div>
+      </div>
+      <div class="response-section">
+        <div class="response-counter">
+          <span id="response-count">0</span> / <span id="total-players">0</span> answered
+        </div>
+        <div id="word-cloud" class="word-cloud"></div>
+      </div>
+      <div class="host-controls">
+        <button id="show-results-btn" class="btn btn-secondary">Show Answer</button>
+        <button id="next-btn" class="btn btn-primary">Next Question</button>
+      </div>
+    </div>
+
+    <!-- RESULTS SCREEN -->
+    <div id="results-screen" class="screen">
+      <div class="question-results-header">
+        <h2>Question Results</h2>
+      </div>
+      <div id="question-answer-reveal" class="answer-reveal"></div>
+      <div id="live-rankings" class="rankings-container"></div>
+      <div class="host-controls">
+        <button id="next-from-results-btn" class="btn btn-primary">Next Question</button>
+      </div>
+    </div>
+
+    <!-- FINAL RANKINGS SCREEN -->
+    <div id="final-screen" class="screen">
+      <div class="final-header">
+        <h1>🏆 Final Rankings</h1>
+      </div>
+      <div id="podium" class="podium"></div>
+      <div id="final-rankings" class="rankings-container"></div>
+      <button id="reset-btn" class="btn btn-secondary btn-large">New Quiz</button>
+    </div>
+  </div>
+
+  <script>
+    let wsConnection = null;
+    let currentQuestion = null;
+    let timerInterval = null;
+    let timeRemaining = 0;
+
+    // Elements
+    const selectScreen = document.getElementById('select-screen');
+    const lobbyScreen = document.getElementById('lobby-screen');
+    const questionScreen = document.getElementById('question-screen');
+    const resultsScreen = document.getElementById('results-screen');
+    const finalScreen = document.getElementById('final-screen');
+
+    function showScreen(screen) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      screen.classList.add('active');
+    }
+
+    // Load available quizzes
+    fetch('/api/quizzes')
+      .then(res => res.json())
+      .then(data => {
+        const container = document.getElementById('quiz-options');
+        container.innerHTML = data.quizzes.map(q =>
+          `<button class="quiz-select-btn" data-id="${q.id}">
+            <span class="quiz-select-icon">📋</span>
+            <span class="quiz-select-label">${escapeHtml(q.label)}</span>
+          </button>`
+        ).join('');
+
+        container.querySelectorAll('.quiz-select-btn').forEach(btn => {
+          btn.addEventListener('click', () => selectQuiz(btn.dataset.id));
+        });
+      });
+
+    function selectQuiz(quizId) {
+      fetch('/api/select-quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ quizId }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('quiz-title').textContent = data.title;
+            showScreen(lobbyScreen);
+            loadQRCode();
+            connectWebSocket();
+          }
+        });
+    }
+
+    function loadQRCode() {
+      fetch('/api/qrcode')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('qr-code').src = data.qr;
+          document.getElementById('join-url').textContent = data.url;
+        });
+    }
+
+    function connectWebSocket() {
+      if (wsConnection) wsConnection.close();
+      wsConnection = new WebSocket(`ws://${window.location.host}`);
+
+      wsConnection.onopen = () => {
+        wsConnection.send(JSON.stringify({ type: 'host-join' }));
+      };
+
+      wsConnection.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        switch (data.type) {
+          case 'game-state':
+            updateGameState(data);
+            break;
+          case 'player-joined':
+            updatePlayerList(data.players);
+            break;
+          case 'player-left':
+            updatePlayerList(data.players);
+            break;
+          case 'question-host':
+            showQuestion(data);
+            break;
+          case 'player-responded':
+            updateResponses(data);
+            break;
+          case 'question-results':
+            showQuestionResults(data);
+            break;
+          case 'quiz-finished':
+            showFinalRankings(data.rankings);
+            break;
+          case 'quiz-reset':
+            resetToLobby(data.players);
+            break;
+        }
+      };
+    }
+
+    function updateGameState(data) {
+      updatePlayerList(data.players);
+    }
+
+    function updatePlayerList(players) {
+      const count = players.length;
+      document.getElementById('player-count').textContent = count;
+      document.getElementById('start-btn').disabled = count === 0;
+
+      const listEl = document.getElementById('player-list');
+      listEl.innerHTML = players.map(p =>
+        `<div class="player-chip">${escapeHtml(p.name)}</div>`
+      ).join('');
+    }
+
+    function showQuestion(data) {
+      showScreen(questionScreen);
+      currentQuestion = data;
+
+      document.getElementById('q-current').textContent = data.questionIndex + 1;
+      document.getElementById('q-total').textContent = data.totalQuestions;
+      document.getElementById('question-text').textContent = data.question;
+      document.getElementById('total-players').textContent = data.totalPlayers;
+      document.getElementById('response-count').textContent = '0';
+
+      // Display options
+      const optionsEl = document.getElementById('options-display');
+      const colors = ['opt-red', 'opt-blue', 'opt-yellow', 'opt-green'];
+      const shapes = ['▲', '◆', '●', '■'];
+      optionsEl.innerHTML = data.options.map((opt, i) =>
+        `<div class="option-card ${colors[i]}">
+          <span class="option-shape">${shapes[i]}</span>
+          <span class="option-text">${escapeHtml(opt)}</span>
+        </div>`
+      ).join('');
+
+      // Clear word cloud
+      document.getElementById('word-cloud').innerHTML = '';
+
+      // Start timer
+      startTimer(data.timeLimit);
+    }
+
+    function startTimer(seconds) {
+      clearInterval(timerInterval);
+      timeRemaining = seconds;
+      document.getElementById('timer-value').textContent = Math.ceil(timeRemaining);
+
+      timerInterval = setInterval(() => {
+        timeRemaining -= 0.1;
+        if (timeRemaining <= 0) {
+          timeRemaining = 0;
+          clearInterval(timerInterval);
+        }
+        document.getElementById('timer-value').textContent = Math.ceil(timeRemaining);
+      }, 100);
+    }
+
+    function updateResponses(data) {
+      document.getElementById('response-count').textContent = data.responsesCount;
+
+      // Update word cloud
+      const cloudEl = document.getElementById('word-cloud');
+      cloudEl.innerHTML = '';
+      const names = data.wordCloudNames;
+      names.forEach((name, i) => {
+        const span = document.createElement('span');
+        span.className = 'cloud-word';
+        span.textContent = name;
+        // Vary size based on response order (earlier = bigger)
+        const size = Math.max(0.8, 1.5 - (i * 0.05));
+        span.style.fontSize = `${size}rem`;
+        span.style.animationDelay = `${i * 0.1}s`;
+        cloudEl.appendChild(span);
+      });
+    }
+
+    function showQuestionResults(data) {
+      showScreen(resultsScreen);
+      clearInterval(timerInterval);
+
+      // Show correct answer
+      const revealEl = document.getElementById('question-answer-reveal');
+      if (currentQuestion) {
+        const colors = ['opt-red', 'opt-blue', 'opt-yellow', 'opt-green'];
+        revealEl.innerHTML = `
+          <h3>${escapeHtml(currentQuestion.question)}</h3>
+          <div class="options-grid">
+            ${currentQuestion.options.map((opt, i) =>
+              `<div class="option-card ${colors[i]} ${i === data.correctAnswer ? 'correct' : 'incorrect'}">
+                <span class="option-text">${escapeHtml(opt)}</span>
+                ${i === data.correctAnswer ? '<span class="check">✓</span>' : ''}
+              </div>`
+            ).join('')}
+          </div>
+        `;
+      }
+
+      // Show live rankings
+      const rankingsEl = document.getElementById('live-rankings');
+      rankingsEl.innerHTML = renderRankings(data.rankings);
+    }
+
+    function showFinalRankings(rankings) {
+      showScreen(finalScreen);
+      clearInterval(timerInterval);
+
+      // Podium for top 3
+      const podiumEl = document.getElementById('podium');
+      const top3 = rankings.slice(0, 3);
+      const podiumOrder = [1, 0, 2]; // 2nd, 1st, 3rd for visual layout
+      podiumEl.innerHTML = podiumOrder.map(i => {
+        const player = top3[i];
+        if (!player) return '';
+        const medals = ['🥇', '🥈', '🥉'];
+        const heights = ['180px', '140px', '110px'];
+        return `
+          <div class="podium-place podium-${i + 1}">
+            <div class="podium-medal">${medals[i]}</div>
+            <div class="podium-name">${escapeHtml(player.name)}</div>
+            <div class="podium-score">${player.score} pts</div>
+            <div class="podium-bar" style="height: ${heights[i]}"></div>
+          </div>
+        `;
+      }).join('');
+
+      // Full rankings
+      const rankingsEl = document.getElementById('final-rankings');
+      rankingsEl.innerHTML = renderRankings(rankings);
+    }
+
+    function renderRankings(rankings) {
+      return `<table class="rankings-table">
+        <thead>
+          <tr>
+            <th>Rank</th>
+            <th>Player</th>
+            <th>Correct</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rankings.map((p, i) => `
+            <tr class="${i < 3 ? 'top-three' : ''}">
+              <td class="rank">${i + 1}</td>
+              <td class="player-name">${escapeHtml(p.name)}</td>
+              <td>${p.correctAnswers}</td>
+              <td class="score">${p.score}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>`;
+    }
+
+    function resetToLobby(players) {
+      showScreen(lobbyScreen);
+      updatePlayerList(players);
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Button handlers
+    document.getElementById('start-btn').addEventListener('click', () => {
+      wsConnection.send(JSON.stringify({ type: 'start-quiz' }));
+    });
+
+    document.getElementById('show-results-btn').addEventListener('click', () => {
+      wsConnection.send(JSON.stringify({ type: 'show-results' }));
+    });
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+      wsConnection.send(JSON.stringify({ type: 'next-question' }));
+    });
+
+    document.getElementById('next-from-results-btn').addEventListener('click', () => {
+      wsConnection.send(JSON.stringify({ type: 'next-question' }));
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      wsConnection.send(JSON.stringify({ type: 'reset-quiz' }));
+      showScreen(selectScreen);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+{
+  "quizTitle": "AI, Gen AI & Agentic AI in BFSI – Batch B",
+  "timePerQuestion": 20,
+  "questions": [
+    {
+      "id": 1,
+      "question": "In the deck's concept stack, which layer is described as 'creates content'?",
+      "options": ["AI / Machine Learning", "Generative AI", "Agentic AI", "Predictive Analytics"],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 2,
+      "question": "On the maturity curve, which stage covers 'chatbots, co-pilots, document drafting at scale'?",
+      "options": ["Pre-2015: Rule-Based Automation", "2015–2022: Predictive AI", "2023–2025: Generative AI", "2026 →: Agentic AI"],
+      "correctAnswer": 2,
+      "timeLimit": 20
+    },
+    {
+      "id": 3,
+      "question": "What is KPMG cited as estimating for 2025?",
+      "options": ["44% of finance teams using agentic AI", "$50B in global spend on agentic AI", "35% drop in loan fraud", "94% cost reduction in document workflows"],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 4,
+      "question": "Which four UK banks does the deck name as running real-time ML models for fraud & transaction monitoring?",
+      "options": ["NatWest, Barclays, HSBC, Lloyds", "Monzo, Revolut, Starling, Wise", "NatWest, Santander, TSB, Metro Bank", "HSBC, Standard Chartered, Citi, JPMorgan"],
+      "correctAnswer": 0,
+      "timeLimit": 20
+    },
+    {
+      "id": 5,
+      "question": "Which three fintech challengers does the deck name as competing with UK incumbents?",
+      "options": ["Chime, SoFi, Robinhood", "Monzo, Revolut, Starling", "N26, Wise, Klarna", "Nubank, Chime, Cash App"],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 6,
+      "question": "What UK-bank result does the deck cite for embedding AI agents into loan approval workflows?",
+      "options": ["90% lower build cost", "35% drop in loan fraud", "21 customer journeys supported", "70,000 hours of staff time saved"],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 7,
+      "question": "In insurance, what percentage lower cost does the deck cite for building production GenAI systems vs. the 2022 baseline?",
+      "options": ["35%", "44%", "~90%", "99%"],
+      "correctAnswer": 2,
+      "timeLimit": 20
+    },
+    {
+      "id": 8,
+      "question": "In asset & wealth management, what does agentic AI replace the 'monthly review cadence' with?",
+      "options": ["Quarterly board reviews", "A continuous diagnostic loop", "Annual audits only", "Fully manual weekly check-ins"],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 9,
+      "question": "Which two firms does the deck name as participating in the FCA's AI Live Testing?",
+      "options": ["Barclays and UBS", "NatWest and HSBC", "Lloyds and Santander", "Monzo and Revolut"],
+      "correctAnswer": 0,
+      "timeLimit": 20
+    },
+    {
+      "id": 10,
+      "question": "What was distinctive about the NatWest × FITT partnership, according to the deck?",
+      "options": ["It was FITT's largest research grant ever received", "It was FITT's first-ever partnership with a global bank", "It was announced by the Reserve Bank of India", "It focused exclusively on blockchain research"],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 11,
+      "question": "Per the 'Career Takeaways' slide, what does the 'Business–tech translator' role bridge?",
+      "options": ["Two competing banks during a merger", "Data science teams and business/compliance stakeholders", "Retail customers and call-centre staff", "Regulators and shareholders"],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    },
+    {
+      "id": 12,
+      "question": "Per the closing summary slide, which sector is described as scoping agentic AI 'more cautiously' than banking?",
+      "options": ["Wealth management only", "Insurance and asset management", "Retail payments", "Corporate treasury"],
+      "correctAnswer": 1,
+      "timeLimit": 20
+    }
+  ]
+}
