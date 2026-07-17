@@ -61,8 +61,7 @@
         <div id="word-cloud" class="word-cloud"></div>
       </div>
       <div class="host-controls">
-        <button id="show-results-btn" class="btn btn-secondary">Show Answer</button>
-        <button id="next-btn" class="btn btn-primary">Next Question</button>
+        <button id="show-results-btn" class="btn btn-primary">Show Answer</button>
       </div>
     </div>
 
@@ -363,10 +362,6 @@
 
     document.getElementById('show-results-btn').addEventListener('click', () => {
       wsConnection.send(JSON.stringify({ type: 'show-results' }));
-    });
-
-    document.getElementById('next-btn').addEventListener('click', () => {
-      wsConnection.send(JSON.stringify({ type: 'next-question' }));
     });
 
     document.getElementById('next-from-results-btn').addEventListener('click', () => {
