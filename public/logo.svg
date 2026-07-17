@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none">
+  <!-- Background circle -->
+  <circle cx="60" cy="60" r="58" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="2"/>
+  
+  <!-- Brain/AI icon -->
+  <path d="M60 25c-8 0-14.5 4-17.5 10-4.5 1-8 4.5-8 9 0 2 .6 3.8 1.6 5.3C33.5 51.5 32 54.5 32 58c0 5 3 9.3 7.3 11.2.3 5.8 5 10.3 10.7 10.8 2.5 3.5 6.5 5.5 10 5.5s7.5-2 10-5.5c5.7-.5 10.4-5 10.7-10.8C85 67.3 88 63 88 58c0-3.5-1.5-6.5-4.1-8.7 1-1.5 1.6-3.3 1.6-5.3 0-4.5-3.5-8-8-9C74.5 29 68 25 60 25z" fill="url(#brainGrad)" opacity="0.9"/>
+  
+  <!-- Neural network nodes -->
+  <circle cx="48" cy="48" r="3" fill="#fff" opacity="0.9"/>
+  <circle cx="72" cy="48" r="3" fill="#fff" opacity="0.9"/>
+  <circle cx="60" cy="40" r="3" fill="#fff" opacity="0.9"/>
+  <circle cx="52" cy="60" r="3" fill="#fff" opacity="0.9"/>
+  <circle cx="68" cy="60" r="3" fill="#fff" opacity="0.9"/>
+  <circle cx="60" cy="70" r="3" fill="#fff" opacity="0.9"/>
+  
+  <!-- Neural connections -->
+  <line x1="48" y1="48" x2="60" y2="40" stroke="#fff" stroke-width="1.2" opacity="0.6"/>
+  <line x1="72" y1="48" x2="60" y2="40" stroke="#fff" stroke-width="1.2" opacity="0.6"/>
+  <line x1="48" y1="48" x2="52" y2="60" stroke="#fff" stroke-width="1.2" opacity="0.6"/>
+  <line x1="72" y1="48" x2="68" y2="60" stroke="#fff" stroke-width="1.2" opacity="0.6"/>
+  <line x1="52" y1="60" x2="60" y2="70" stroke="#fff" stroke-width="1.2" opacity="0.6"/>
+  <line x1="68" y1="60" x2="60" y2="70" stroke="#fff" stroke-width="1.2" opacity="0.6"/>
+  <line x1="48" y1="48" x2="68" y2="60" stroke="#fff" stroke-width="0.8" opacity="0.3"/>
+  <line x1="72" y1="48" x2="52" y2="60" stroke="#fff" stroke-width="0.8" opacity="0.3"/>
+  
+  <!-- BFSI symbols: small currency/chart icon -->
+  <path d="M42 82l4-4 5 3 6-6 5 2 4-5" stroke="#ffd700" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+  <circle cx="75" cy="82" r="5" stroke="#ffd700" stroke-width="1.5" fill="none" opacity="0.8"/>
+  <text x="75" y="85" text-anchor="middle" font-size="7" fill="#ffd700" font-weight="bold" opacity="0.8">$</text>
+  
+  <!-- MDI text at bottom -->
+  <text x="60" y="104" text-anchor="middle" font-size="10" fill="#ffffff" font-family="Arial, sans-serif" font-weight="bold" letter-spacing="2">MDI GURGAON</text>
+  
+  <!-- Gradients -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#16213e"/>
+    </linearGradient>
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+    <linearGradient id="brainGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="50%" stop-color="#764ba2"/>
+      <stop offset="100%" stop-color="#667eea"/>
+    </linearGradient>
+  </defs>
+</svg>

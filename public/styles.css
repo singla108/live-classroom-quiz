@@ -110,6 +110,25 @@ body {
   font-weight: 600;
 }
 
+/* ===== LOGO ===== */
+.quiz-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.logo-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+}
+
+.logo-img.logo-sm {
+  width: 70px;
+  height: 70px;
+}
+
 /* ===== LOBBY SCREEN ===== */
 .header {
   text-align: center;
@@ -128,6 +147,12 @@ body {
   color: rgba(255, 255, 255, 0.7);
   font-size: 1.2rem;
   margin-top: 0.5rem;
+}
+
+.subtitle-small {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 0.3rem;
 }
 
 .lobby-content {
@@ -459,7 +484,17 @@ body {
 }
 
 .login-header h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.login-header .subtitle-small {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.5rem;
 }
 
 .login-header p {
