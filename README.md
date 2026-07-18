@@ -4,6 +4,33 @@ A real-time interactive quiz application built for classroom sessions. Students 
 
 Built for the **"AI, Generative AI & Agentic AI in Banking, Financial Services & Insurance"** session at MDI Gurgaon.
 
+## Screenshots
+
+### 1. Quiz Selection
+Select between multiple quiz batches (Batch A / Batch B).
+
+![Quiz Selection](docs/screenshots/01-quiz-selection.png)
+
+### 2. QR Code Lobby
+Students scan the QR code from their phones to join. Player names appear as they connect.
+
+![QR Code Lobby](docs/screenshots/02-qr-lobby.png)
+
+### 3. Live Question
+Timed questions with color-coded options. Word cloud animates student names as they respond.
+
+![Live Question](docs/screenshots/03-question.png)
+
+### 4. Answer Reveal & Rankings
+Correct answer highlighted in green with live leaderboard after each question.
+
+![Answer Reveal](docs/screenshots/04-answer-reveal.png)
+
+### 5. Final Podium
+Top 3 on the podium with full rankings table — scored by correctness and speed.
+
+![Final Rankings](docs/screenshots/05-final-rankings.png)
+
 ## Features
 
 - **QR Code Login** — Students scan a QR code on the projector to join instantly from their phones
