@@ -1,6 +1,6 @@
 # MDI Gurgaon - AI in BFSI Quiz App
 
-A real-time interactive quiz application built for classroom sessions. Students scan a QR code to join from their phones, answer timed questions, and compete on a live leaderboard — similar to Kahoot but self-hosted and fully customizable.
+A real-time interactive quiz application built for classroom sessions. Students scan a QR code to join from their phones, answer timed questions, and compete on a live leaderboard — similar to Kahoot but free, custom application built using AI, self-hosted on Render and fully customizable.
 
 Built for the **"AI, Generative AI & Agentic AI in Banking, Financial Services & Insurance"** session at MDI Gurgaon.
 
